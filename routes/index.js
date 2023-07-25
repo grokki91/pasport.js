@@ -30,6 +30,7 @@ router.get('/api/user/signup', (req, res) => {
 })
 
 router.post('/api/user/login', (req, res, next) => {
+    console.log('Post req.body for /api/user/login = ', req.body);
     passport.authenticate('local', (err, user) => {
         if (err) {
             return next(err)
