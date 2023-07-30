@@ -19,7 +19,7 @@ router.get('/api/user/me',
     },
     (req, res) => {
         res.render('login', {
-            title: 'Hello, Admin!'
+            title: `Hello, ${req.user.email}!`,
         })
 })
 
@@ -30,7 +30,6 @@ router.get('/api/user/signup', (req, res) => {
 })
 
 router.post('/api/user/login', (req, res, next) => {
-    console.log('Post req.body for /api/user/login = ', req.body);
     passport.authenticate('local', (err, user) => {
         if (err) {
             return next(err)
@@ -47,11 +46,16 @@ router.post('/api/user/login', (req, res, next) => {
     })(req, res, next)
 })
 
-router.post('/api/user/signup',(req, res) => {
+router.post('/api/user/signup',(req, res, next) => {
     let {email, password} = req.body
-    const newUser = new User(email, password)
-    users.push(newUser)
-    res.redirect('/api/user/me')
+    const emailMatches = users.find(user => user.email === email)
+
+    if (!emailMatches) {
+        const newUser = new User(email, password)
+        users.push(newUser)
+        res.redirect('/api/user/me')
+    }
+    res.redirect('/api/user/signup')
 })
 
 module.exports = router

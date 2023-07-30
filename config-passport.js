@@ -3,28 +3,27 @@ const LocalStrategy = require('passport-local').Strategy
 const { users } = require('./db')
 
 const options = {
-    usernameField: 'email'
+    usernameField: 'email',
+    passwordField: 'password',
+    passReqToCallback: false
 }
 
 const verify = (email, password, done) => {
-    return users.find(user => {
-        if (email === user.email && password === user.password) {
-            console.log('verify');
-            return(null, user)
-        } else {
-            console.log('not verify');
-            return done(null, false)
-        }
-    })
+    const user = users.find(user => email === user.email)
+    if (!user) {
+        return done(null, false)
+    }
+    if (password !== user.password) {
+        return done(null, false)
+    }
+    return done(null, user)
 }
 
 passport.serializeUser((user, cb) => {
-    console.log('serializeUser');
     cb(null, user.id)
 })
 
 passport.deserializeUser((id, cb) => {
-    console.log('deserializeUser');
     const user = users.find(user => user.id === id)
     cb(null, user)
 })
